@@ -1,0 +1,109 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel" id="security">
+            <div class="panel-body">
+                <h4 class="text-center"><b>Signup Form</b></h4>
+                <hr/>
+                <form style="margin-top: 10px;" class="" method="post">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                    <div class="form-group {%if error and error.username %}has-error{%endif%}">
+                        <label class="control-label">Surname:</label>
+                        <input type="text" name="surname" class="form-control" placeholder="Enter Surname">
+                        {%if error and error.username %}
+                        <span class="help-block">{{error.username}}</span>
+                        {%endif%}
+                    </div>
+                    <div class="form-group {%if error and error.othername %}has-error{%endif%}">
+                        <label class="control-label">Othername:</label>
+                        <input type="text" name="othername" class="form-control" placeholder="Enter Othername">
+                        {%if error and error.othername %}
+                        <span class="help-block">{{error.othername}}</span>
+                        {%endif%}
+                    </div>
+                    <div class="form-group {%if error and error.mobile %}has-error{%endif%}">
+                        <label class="control-label">Phone Number:</label>
+                        <input type="tel" name="contact" class="form-control" placeholder="Enter Phone Number">
+                        {%if error and error.mobile %}
+                        <span class="help-block">{{error.mobile}}</span>
+                        {%endif%}
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Community Role:</label>
+                        <div class="form-control">
+                            <label class="control-label">
+                                <input type="radio" name="role" value="0" checked> Member
+                            </label>
+                            <label class="control-label">
+                                <input type="radio" name="role" value="1"> Coordinator
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group {%if error and error.community %}has-error{%endif%}">
+                        <label class="control-label">Community:</label>
+                        <select name="community" class="form-control">
+                            <option value="">Select Community</option>
+                            {% if community %}
+                            {% for com in community %}
+                            <option value="{{com[0]}}">{{com[0]}}</option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                        <input type="text" name="comm" class="form-control hidden" placeholder="Enter Community">
+                        {%if error and error.community %}
+                        <span class="help-block">{{error.community}}</span>
+                        {%endif%}
+                    </div>
+                    <div class="form-group">
+                        <button name="addSecurity" class="btn btn-primary btn-block"
+                            type="submit">
+                            Sign Up
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <button type="reset" class="btn btn-danger">Cancel</button>
+                        <span class="pull-right">
+                            Already have account? <a href="{{url_for('login')}}">click here</a>
+                        </span>
+                    </div>
+                    <br>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.app-name').text("{{pageTitle}}");
+        $('.s_icon').html("<a href='/'><i class='fa fa-arrow-left' " +
+            "></i></a>");
+        $('.fa-bars').hide();
+        $('input[name="role"]').on('change', function () {
+            if ($(this).val() == '1'){
+                $('[name="community"]').addClass('hidden')
+                $('[name="comm"]').removeClass('hidden')
+            } else {
+                $('[name="comm"]').addClass('hidden')
+                $('[name="community"]').removeClass('hidden')
+            }
+        });
+        var loc = $('input[name="location"]');
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(showPosition, function (e) {
+                    loc.val('0,0');
+                });
+            } else {
+                loc.val("Geolocation is not supported by this browser.");
+            }
+        }
+        function showPosition(position) {
+            position ? loc.val(position.coords.latitude + ',' + position.coords.longitude) : '0,0';
+        }
+        getLocation();
+    })
+</script>
+{% endblock %}

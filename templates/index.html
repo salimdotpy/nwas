@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="carousel slide" data-interval="5000" data-ride="carousel" style="margin-bottom: 20px;">
+    <!-- Wrapper for carousel items -->
+    <div class="carousel-inner">
+        <div class="active item">
+            <img src="{{ url_for('static', filename='images/slider1.jfif') }}" style="width: 100%; height: 300px;">
+
+            <div class="carousel-caption">
+                <b class="">{{siteName()[0]}}</b>
+            </div>
+        </div>
+        <div class="item">
+            <img src="{{ url_for('static', filename='images/slider2.jfif') }}" style="width: 100%; height: 300px;">
+            <div class="carousel-caption">
+                <b>Community care, community share</b>
+            </div>
+        </div>
+        <div class="item">
+            <img src="{{ url_for('static', filename='images/slider3.jfif') }}" style="width: 100%; height: 300px;">
+
+            <div class="carousel-caption">
+                <b>See something, say something, safe community</b>
+            </div>
+        </div>
+    </div>
+    <!-- Carousel controls -->
+    <a class="carousel-control left">
+        <span class="glyphicon-chevron-left fa fa-chevron-left"></span>
+    </a>
+    <a class="carousel-control right">
+        <span class=" fa fa-chevron-right glyphicon-chevron-right"></span>
+    </a>
+</div>
+<div class="row">
+    <div class="col-md-6"><a href="{{url_for('login')}}">
+        <div class="panel z-depth-1">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-sign-in fa-4x" style="color: #55d6d6"></i>
+                    </div>
+                    <div class="col-xs-9">
+                        <h5><b>Login</b></h5>
+                        <p>Security | Admin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+    </div>
+    <div class="col-md-6"><a href="{{url_for('signup')}}">
+        <div class="panel z-depth-1">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <i class="fa fa-edit fa-4x" style="color: #55d6d6"></i>
+                    </div>
+                    <div class="col-xs-9">
+                        <h5><b>Signup</b></h5>
+                        <p>Security</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+    </div>
+    <div class="col-md-6">
+        <div class="panel z-depth-1 about">
+            <div class="panel-body">
+                <b>About Us</b>
+                <hr>
+                <p class="text-center" id="about">
+                    <b>{{siteName()[0]}} ({{siteName()[1]}})</b><br><br>
+                    Design and Developed by 
+                    <a href="#studentListModal" data-toggle="modal"><b>HNDII 2023/2024</b></a>
+                    Set and Supervised by
+                    <b>Engr. Abdulwakil Adekunle Kasali.</b> All rights reserved.
+                    For Enquiry, call <a href="tel:+2347030337708">+2347030337708</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script_lib %}
+<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+{% endblock %}
+{% block script %}
+<script>
+    getLocation();
+</script>
+{% endblock %}

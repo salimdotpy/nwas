@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+    main {
+        padding: 0;
+        margin: 0;
+    }
+    a .fa:before {
+        font-size: large;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="map-wrapper">
+    <div id='map'></div>
+    <input id='txt-marker-coord' type='text' value='' hidden>
+
+    <div class="map-keys">
+        <a onclick="changeMap();"><i class="fa fa-image"></i></a>
+        <a onclick="centerMap();"><i class="fa fa-arrows"></i></a>
+        <a onclick="document.location.reload();"><i class="fa fa-refresh"></i></a>
+    </div>
+</div>
+<div id="distanceModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Distance</h4>
+            </div>
+            <div class="modal-body" id="distance" style="max-height: 70vh; overflow-y: auto">
+                <p>Distance between each points will appear here</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script_lib %}
+<script src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true'></script>
+<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('.app-name').text("{{pageTitle}}");
+        $('.fa-power-off, #s_logo').hide();
+        $('.s_icon').html("<a href='{{url_for('user.dashboard')}}'><i class='fa fa-arrow-left' " +
+            "></i></a>");
+    })
+</script>
+<script>
+    getLocation();
+    setTimeout(function () {
+        initMap(true);
+    }, 5000);
+    setTimeout(() => {
+        setInterval(() => {
+            updateLocation();
+        }, 100);
+    }, 10000);
+</script>
+{% endblock %}

@@ -1,0 +1,277 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+    .modal:nth-of-type(even){z-index: 1051!important;}
+    .modal-backdrop.show:nth-of-type(even){z-index: 1052!important;}
+    .a-flex{
+        display: flex; justify-content: space-between; overflow-x: auto;
+    }
+    .a-flex>div, .a-flex>label{
+        flex-basis: 38%; flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="alert alert-info fade in" role="alert">
+    <a href="#" class="close" data-dismiss="alert">&times;</a>
+    <i class='fa fa-fw fa-info-circle'></i>
+    You have new notification
+    <b><a href="{{url_for('user.track')}}">check</a></b>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <a href="#riaseAlarm" data-toggle="modal" data-backdrop="static">
+            <div class="panel z-depth-1">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-bullhorn fa-4x" style="color: #55d6d6"></i>
+                        </div>
+                        <div class="col-xs-9">
+                            <h5><b>Riase Alarm</b></h5>
+                            <p>Create awareness of an incident</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a href="{{url_for('user.member')}}" data-toggle="modal" data-backdrop="static">
+            <div class="panel z-depth-1">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-users fa-4x" style="color: #55d6d6"></i>
+                        </div>
+                        <div class="col-xs-9">
+                            <h5><b>Other Member</b></h5>
+                            <p>View other security members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a href="#editProfile" data-toggle="modal" data-backdrop="static">
+            <div class="panel z-depth-1">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-edit fa-4x" style="color: #55d6d6"></i>
+                        </div>
+                        <div class="col-xs-9">
+                            <h5><b>Update Profile</b></h5>
+                            <p>Edit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a href="#editPassword" data-toggle="modal" data-backdrop="static">
+            <div class="panel z-depth-1">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-edit fa-4x" style="color: #55d6d6"></i>
+                        </div>
+                        <div class="col-xs-9">
+                            <h5><b>Change Password</b></h5>
+                            <p>Edit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel z-depth-1">
+            <div class="panel-body">
+                <b>Recent Incident</b>
+                <hr>
+                <div class="table-responsive">
+                    <table id="a_history" class="table table-bordered table-hover" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>S/N</th><th>Incident</th>
+                            <th>Riaser</th><th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>What was happen?</td>
+                                <td>Who riase it</td>
+                                <td>The Status of the incident</td>
+                                <td>Date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="clear-fix">
+                    <a href="" class="pull-right btn btn-info">See more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="panel z-depth-1 about">
+            <div class="panel-body">
+                <b>About Us</b>
+                <hr>
+                <p class="text-center" id="about">
+                    <b>{{siteName()[0]}} ({{siteName()[1]}})</b><br><br>
+                    Design and Developed by 
+                    <a href="#studentListModal" data-toggle="modal"><b>HNDII 2023/2024</b></a>
+                    Set and Supervised by
+                    <b>Engr. Abdulwakil Adekunle Kasali.</b> All rights reserved.
+                    For Enquiry, call <a href="tel:+2347030337708">+2347030337708</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script_lib %}
+<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+{% endblock %}
+{% block script %}
+<div class="modal fade crud-modal-sm" id="editPassword" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <b>Change Password</b>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{url_for('user.password')}}">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                    <div class="form-group">
+                        <label class="required">Current Password</label>
+                        <input type="password" name="opass" class="form-control" placeholder="Enter Current Password" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">New Password</label>
+                        <input type="password" name="npass" class="form-control" placeholder="Enter Current Password" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Confirm Password</label>
+                        <input type="password" name="cpass" class="form-control" placeholder="Enter Password Again" required="">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right" name="editCitizenPassword" type="submit">Update</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editProfile" role="dialog">
+    <div class="modal-dialog" style="margin-top: 15%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <b>Update Profile</b>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" enctype="multipart/form-data" action="{{url_for('user.profile')}}">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="required">Surname</label>
+                                <input type="text" name="surname" class="form-control" placeholder="Enter your name" value="{{user.surname}}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Othername</label>
+                                <input type="text" name="othername" class="form-control" placeholder="Enter your name" value="{{user.othername}}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-group">
+                                    <input type="hidden" name="oldImage" value="{{user.image}}">
+                                    <input type="file" class="hidden" accept="image/*" id="file" name="image" onchange="imgs(this, '#out')">
+                                    <img src="/static/images/{% if user.image %}users/{{user.image}}{% else %}noimage.png{% endif %}"
+                                    onclick="$('#file').click()" id="out" class="img-responsive thumbnail " style="width: 100%; height: 140px">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Phone Number</label>
+                        <input type="tel" name="contact" class="form-control" placeholder="Enter Phone Number" value="{{user.mobile}}" required="">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Community</label>
+                        <input type="text" disabled readonly class="form-control" value="{{user.community}}">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right" name="editCitizenProfile" type="submit">Update</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="riaseAlarm" role="dialog">
+    <div class="modal-dialog modal-sm" style="margin-top: 15%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <b>Riase Alarm</b>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div class="form-group">
+                        <label class="required">Incident</label>
+                        <input type="text" name="incident" class="form-control" placeholder="What's happing? (in short)" maxlength="39" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Location</label>
+                        <input type="text" name="location" class="form-control" readonly required>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right"type="submit">Continue</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.app-name').text("{{pageTitle}}");
+        $('.fa-power-off').hide();
+        // $('#a_history').DataTable();
+        // $('#a_history_wrapper').addClass('table-responsive');
+        var loc = $('input[name="location"]');
+        getLocation();
+        loc.val(`${cord_pos.lat},${cord_pos.lng}`);
+    })
+    function imgs(input, destination) {
+        if (input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                $(destination).attr('src', event.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+{% endblock %}

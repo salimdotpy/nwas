@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>{{siteName()[1]}} - {{ pageTitle }}</title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'>
+    <meta name="theme-color" content="cyan"/>
+    <meta name="description" content="{{siteName[0]}}">
+    <meta name="author" content="SalimTech">
+    <meta name="keywords" content="{{siteName[0]}};{{siteName[1]}}">
+    <meta name="robots" content="all">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/logo.png') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mytoast.css') }}"/>
+    {% block style_lib %}{% endblock %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.dataTables.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+    {% block style %}{% endblock %}
+</head>
+<body class="mobile-open">
+<div class="loading">
+        <span class="fa-stack fa-lg tada animated infinite" style="position: absolute">
+            <i class="fa fa-circle fa-stack-2x"></i>
+            <i class="fa fa-bullhorn fa-stack-1x fa-inverse"></i>
+        </span>
+    <i class="fa fa-spinner fa-pulse fa-4x" style="color: #fff"></i>
+</div>
+<div class="page-wrapper">
+    <div class="side-flow" id="aside"></div>
+    <aside>
+        <div class="side-header">
+            <br>
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="site logo" class="img-circle" style="border: #fff 2px solid; height: 50%; background: #fff; outline: #fff 2px solid;" width="40%" id="logo">
+            <a href="/">{{siteName()[0]}} ({{siteName()[1]}})</a>
+        </div>
+        <ul class="side-nav tiny-scroll">
+            {%if user %}
+            <li>
+                <a href="{{url_for('user.dashboard')}}">
+                    <i class="fa fa-dashboard menu-icon"></i>
+                    <span class="menu-title">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#editProfile" data-toggle="modal" data-backdrop="static">
+                    <i class="fa fa-edit menu-icon"></i>
+                    <span class="menu-title">Update Profile</span>
+                </a>
+            </li>
+            <li>
+                <a href="#editPassword" data-toggle="modal" data-backdrop="static">
+                    <i class="fa fa-edit menu-icon"></i>
+                    <span class="menu-title">Change Password</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{url_for('user.logout')}}">
+                    <i class="fa fa-sign-out menu-icon"></i>
+                    <span class="menu-title">Logout</span>
+                </a>
+            </li>
+            {%else%}
+            <li>
+                <a href="/">
+                    <i class="fa fa-home menu-icon"></i>
+                    <span class="menu-title">Home</span>
+                </a>
+            </li>
+            <li>
+                <a href="#studentListModal" data-toggle="modal">
+                    <i class="fa fa-info-circle menu-icon"></i>
+                    <span class="menu-title">Developer Info</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" onclick="def.Share('Thanks for sharing...')">
+                    <i class="fa fa-share-alt menu-icon"></i>
+                    <span class="menu-title">Share app</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://wa.me/+2348076738293?text=@LAP Measure \nType your message here">
+                    <i class="fa fa-whatsapp menu-icon"></i>
+                    <span class="menu-title">Feedback</span>
+                </a>
+            </li>
+            <li>
+                <a href="mailto:salimdotpy@gmail.com?subject=Report Bug from LAP Measure&body=Type your message here">
+                    <i class="fa fa-bug menu-icon"></i>
+                    <span class="menu-title">Report Bug</span>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" onclick="def.logOut('Exit App...')">
+                    <i class="fa fa-power-off menu-icon"></i>
+                    <span class="menu-title">Exit</span>
+                </a>
+            </li>
+            {%endif%}
+        </ul>
+        <div class="side-footer">
+            <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                2024 &copy; &nbsp;<i>({{siteName()[1]}})</i>
+            </span>
+        </div>
+    </aside>
+    <nav>
+        <div class="nav-btn">
+            <button class="hidden-xs hidden-sm s_icon" id="toggle"><i class="fa fa-bars"></i></button>
+            <button class="hidden-md hidden-lg s_icon" id="mobile"><i class="fa fa-bars"></i></button>
+        </div>
+        <h3 class="app-name">{{siteName()[1]}}</h3>
+        <a href=""><i class="fa fa-power-off"></i></a>
+    </nav>
+    <main class="body-wrapper">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+<div id="studentListModal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Developer List</h4>
+            </div>
+            <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
+                <div class="list-group">
+                    <a href="#" class="list-group-item">
+                        NAME <span class="badge">MATRIC NO</span>
+                    </a>
+                    <a href="#" class="list-group-item">
+                        NAME <span class="badge">MATRIC NO</span>
+                    </a>
+                    <a href="#" class="list-group-item">
+                        NAME <span class="badge">MATRIC NO</span>
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/jquery-2.2.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.dataTables.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% include 'notify.html' %}
+{% block script_lib %}{% endblock %}
+<script>
+    $(document).ready(function () {
+        var dd = new Date();
+        $('#copyYear').text(dd.getFullYear());
+    });
+    var startY;
+    var threshold = 150; // Minimum distance to trigger refresh (in pixels)
+    $("body").on("touchstart", function (e) {
+        startY = e.originalEvent.touches[0].pageY;
+    }).on("touchmove", function (e) {
+        var distance = e.originalEvent.touches[0].pageY - startY;
+        if (distance > threshold) {
+            $(".loading").show();
+        } else {
+            $(".loading").fadeOut("slow");
+        }
+    }).on("touchend", function (e) {
+        var distance = e.originalEvent.changedTouches[0].pageY - startY;
+        if (distance > threshold) {
+            // Perform your refresh action here
+            location.reload(); // For example, reload the page
+        }
+        $(".loading").fadeOut("slow");
+    });
+</script>
+{% block script %}{% endblock %}
+</body>
+</html>

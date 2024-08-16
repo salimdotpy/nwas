@@ -1,0 +1,194 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#security">Security</a></li>
+            <li><a data-toggle="tab" href="#admin">Admin</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="panel tab-pane fade in active" id="security">
+                <div class="panel-body">
+                    <form style="margin-top: 10px;" method="post">
+                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                        <div class="form-group">
+                            <label>Phone Number:</label>
+                            <input type="tel" class="form-control" name="contact"
+                                placeholder="Enter Phone Number">
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label>Password:</label>
+                            <i class="fa fa-eye seePass" style="position: absolute; right: 15px; top: 36px"></i>
+                            <input type="password" class="form-control pass" name="password"
+                                placeholder="Enter Surname">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary btn-block" name="loginSecurity"
+                                type="submit">Login</button>
+                        </div>
+                        <p class="text-center">Not have account?
+                            <a href="{{url_for('signup')}}">Create one!</a>
+                        </p>
+                        <div class="form-group">
+                            <button type="reset" class="btn btn-danger">Cancel</button>
+                            <a href="#forgotPasswordModal" class="pull-right" data-toggle="modal" data-backdrop="static"
+                                data-db="security">
+                                Forgot Password?
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel tab-pane fade" id="admin">
+                <div class="panel-body">
+                    <form style="margin-top: 10px;" method="post" action="{{url_for('admin.login')}}">
+                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                        <div class="form-group">
+                            <label>Username:</label>
+                            <input type="text" name="username" class="form-control"
+                                placeholder="Enter Username" required>
+                        </div>
+                        <div class="form-group" style="position: relative">
+                            <label>Password:</label>
+                            <i class="fa fa-eye seePass" style="position: absolute; right: 15px; top: 36px"></i>
+                            <input type="password" name="password" class="form-control pass"
+                                placeholder="Enter Password" required>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary btn-block" type="submit">Login</button>
+                        </div>
+                        <div class="form-group">
+                            <button type="reset" class="btn pull-right btn-danger">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<div id="forgotPasswordModal" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="margin-top: 20vh">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Forgot Password Form</h4>
+            </div>
+            <div class="modal-body">
+                <div id="forgot_error" class="w3-text-red"></div>
+                <form role="form" id="forgotP">
+                    <div class="form-group">
+                        <label class="control-label">Email Address</label>
+                        <input type="email" class="form-control" placeholder="Enter Email Address" name="email"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Phone Number</label>
+                        <input type="number" class="form-control" placeholder="Enter Phone Number" name="contact"
+                            required>
+                        <input type="hidden" name="tbl" value="security">
+                    </div>
+                </form>
+                <form role="form" class="" id="resetP">
+                    <div class="form-group">
+                        <label class="control-label">Create new Password</label>
+                        <input type="password" class="form-control" placeholder="Create new Password" name="npass"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Confirm Password</label>
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="cpass"
+                            required>
+                        <input type="hidden" name="email" id="email">
+                        <input type="hidden" name="tbl" value="users">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="forgotRest()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        var hash = window.location.hash;
+        if (hash) $('ul.nav a[href="' + hash + '"]').click();
+        $('.app-name').text("{{pageTitle}}");
+        $('.s_icon').html("<a href='/'><i class='fa fa-arrow-left' " +
+            "></i></a>");
+        $('#s_logo').hide();
+    });
+    var _seePass = $('.seePass'), _pass = $('.pass');
+    _seePass.on('click', function () {
+        $(this).toggleClass('fa-eye-slash').toggleClass('fa-eye');
+        if ($(this).hasClass('fa-eye-slash')) _pass.attr('type', 'text');
+        else _pass.attr('type', 'password');
+    });
+    $('#resetP').hide();
+    var check = true;
+    $('#forgotPasswordModal').on('hidden.bs.modal', function () {
+        window.location.reload();
+    }).on('show.bs.modal', function (event) {
+        var ele = $(event.relatedTarget);
+        var db = ele.data('db');
+        $(this).find("input[name='tbl']").val(db);
+    });
+    function forgotRest() {
+        $("#forgot_error").html('');
+        if (check) {
+            $.ajax({
+                url: '/forgetRestPass',
+                method: 'post',
+                data: $('#forgotP').serialize() + '&ajax=1&forgotP=1',
+                dataType: 'json',
+                success: function (res) {
+                    if (res[1]) {
+                        check = false;
+                        $('#forgotP').hide();
+                        $("#forgot_error").html('');
+                        $('#resetP').show();
+                        $('#email').val(res[0]);
+                    }
+                    else {
+                        check = true;
+                        toast_it({ text: res[0], icon: 'error' });
+                        $("#forgot_error").html(res[0]);
+                        $('#forgotP').show();
+                        $('#forgotP')[0].reset();
+                        $('#resetP').hide();
+                    }
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            })
+        } else {
+            $.ajax({
+                url: '/forgetRestPass',
+                method: 'post',
+                data: $('#resetP').serialize() + '&ajax=1&resetP=1',
+                dataType: 'json',
+                success: function (res) {
+                    if (res[1] == 'success') {
+                        toast_it({ text: res[0], icon: 'success', timer: 1900 });
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 2000);
+                    }
+                    else {
+                        $("#forgot_error").html(res[0]);
+                        toast_it({ text: res[0], icon: 'error' });
+                        $('#resetP')[0].reset();
+                    }
+                },
+                error: function (e) {
+                    console.log(e);
+                }
+            })
+        }
+    }
+</script>
+{% endblock %}

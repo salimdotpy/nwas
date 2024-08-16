@@ -1,0 +1,10 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for cat, message in messages %}
+<script>
+    var icon = '{{cat}}';
+    toast_it({ text: '{{message}}', icon: icon });
+</script>
+{% endfor %}
+{% endif %}
+{% endwith %}

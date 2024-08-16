@@ -1,0 +1,170 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+    .modal:nth-of-type(even){z-index: 1051!important;}
+    .modal-backdrop.show:nth-of-type(even){z-index: 1052!important;}
+    .a-flex{
+        display: flex; justify-content: space-between; overflow-x: auto;
+    }
+    .a-flex>div, .a-flex>label{
+        flex-basis: 38%; flex-shrink: 0;
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="row">
+    {%if user.role%}
+    <div class="col-md-12">
+        <a href="#addMember" data-toggle="modal" data-backdrop="static">
+            <div class="panel z-depth-1">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <i class="fa fa-user-plus fa-4x" style="color: #55d6d6"></i>
+                        </div>
+                        <div class="col-xs-9">
+                            <h5><b>Add Member</b></h5>
+                            <p>Add New Member</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {%endif%}
+    <div class="col-md-12">
+        <div class="panel z-depth-1">
+            <div class="panel-body">
+                <b>{{pageTitle}}</b>
+                <hr>
+                <table id="m_history" class="table table-bordered table-hover" style="width:100%">
+                    <thead>
+                    <tr>
+                        <th>S/N</th><th>Name</th>
+                        <th>Role</th><th>Mobile</th>
+                        <th>Image</th><th>Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% if member %}
+                        {% for person in member %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>
+                                {%if person.id == user.id %}You{%else%}{{person.surname}} {{person.othername}}{%endif%}
+                            </td>
+                            <td>{%if person.role%}Coordinator{%else%}Member{%endif%}</td>
+                            <td>{{person.mobile}}</td>
+                            <td>
+                                <a href="{{ getImage('images/users/'+person.image|string)}}">
+                                <img class="img-thumbnail" src="{{ getImage('images/users/'+person.image|string)}}" style="width: 35%; height: 80px;"/>
+                                </a>
+                            </td>
+                            <td>{{person.created_at.strftime("%a, %d %b %Y at %H:%M")}}</td>
+                        </tr>
+                        {%else%}
+                        <tr></tr>    
+                        {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel z-depth-1 about">
+            <div class="panel-body">
+                <b>About Us</b>
+                <hr>
+                <p class="text-center" id="about">
+                    <b>{{siteName()[0]}} ({{siteName()[1]}})</b><br><br>
+                    Design and Developed by 
+                    <a href="#studentListModal" data-toggle="modal"><b>HNDII 2023/2024</b></a>
+                    Set and Supervised by
+                    <b>Engr. Abdulwakil Adekunle Kasali.</b> All rights reserved.
+                    For Enquiry, call <a href="tel:+2347030337708">+2347030337708</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block script_lib %}
+<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+{% endblock %}
+{% block script %}
+<div class="modal fade" id="addMember" role="dialog">
+    <div class="modal-dialog" style="margin-top: 15%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <b>Add Member</b>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="{{url_for('user.member')}}">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
+                    <div class="form-group">
+                        <label class="required">Surname</label>
+                        <input type="text" name="surname" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Othername</label>
+                        <input type="text" name="othername" class="form-control" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Phone Number</label>
+                        <input type="tel" name="contact" class="form-control" placeholder="Enter Phone Number" required="">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right" type="submit">Add Member</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="riaseAlarm" role="dialog">
+    <div class="modal-dialog modal-sm" style="margin-top: 15%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <b>Riase Alarm</b>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div class="form-group">
+                        <label class="required">Incident</label>
+                        <input type="text" name="incident" class="form-control" placeholder="What's happing? (in short)" maxlength="39" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Location</label>
+                        <input type="text" name="location" class="form-control" readonly required>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right"type="submit">Continue</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.app-name').text("{{pageTitle}}");
+        $('.fa-power-off').hide();
+        $('.s_icon').html("<a href='{{url_for('user.dashboard')}}'><i class='fa fa-arrow-left' " +
+            "></i></a>");
+        $('#m_history').DataTable();
+        $('#m_history_wrapper').addClass('table-responsive');
+        var loc = $('input[name="location"]');
+        getLocation();
+        loc.val(`${cord_pos.lat},${cord_pos.lng}`);
+    })
+</script>
+{% endblock %}
