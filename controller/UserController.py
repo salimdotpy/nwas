@@ -1,5 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for, session
-from models import User, Setting, db
+from models import User, Setting, Incident, Notification, db
 from werkzeug.security import generate_password_hash
 import time
 
@@ -9,6 +9,29 @@ class UserController():
         if 'user' in session:
             user = User.query.get(session['user']['id'])
             pageTitle = "Member Dashboard" if user.role == 0 else "Coordinator Dashboard"
+            if request.method == 'POST' and 'riaseAlarm' in request.form:
+                incident = request.form['incident']
+                location = request.form['location']
+                # Validation checks
+                if not incident:
+                    msg = ['Please fill out the form!', 'error']
+                elif not location:
+                    msg = ['Unable to get your location, try again please!', 'error']
+                else:
+                    incident = Incident(uid=user.id, incident=incident, community=user.community, location=location)
+                    try:
+                        db.session.add(incident)
+                        db.session.commit()
+                        notify = Notification(iid=incident.id, text=f'New alarm raised by {user.surname} {user.othername}')
+                        db.session.add(notify)
+                        db.session.commit()
+                        flash('Alarm riased successfully!', 'success')
+                        return redirect(url_for('user.track'))
+                    except: 
+                        db.session.rollback() 
+                        msg = ['Unable to riased alarm, please try again later!', 'error']
+                flash(msg[0], (msg[1]))
+                return redirect(request.referrer)
             return render_template('dashboard.html', pageTitle=pageTitle, user=user)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
