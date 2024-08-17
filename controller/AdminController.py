@@ -44,7 +44,8 @@ class AdminController():
                 try: 
                     db.session.commit()
                     msg = ['Profile updated successfully!', 'success']
-                except: 
+                except:
+                    db.session.rollback()
                     msg = ['Unable to update profile, please try again later!', 'error']
                 session['admin'] = admin.to_dict()
             flash(msg[0], (msg[1]))
@@ -72,6 +73,7 @@ class AdminController():
                     db.session.commit()
                     msg = ['Password updated successfully!', 'success']
                 except: 
+                    db.session.rollback()
                     msg = ['Unable to update password, please try again later!', 'error']
                 session['admin'] = admin.to_dict()
             flash(msg[0], (msg[1]))
@@ -111,6 +113,7 @@ class AdminController():
                         db.session.commit()
                         msg = ['New user added successfully!', 'success']
                     except: 
+                        db.session.rollback()
                         msg = ['Unable to add new user, please try again later!', 'error']
                 flash(msg[0], (msg[1]))
                 return redirect(request.referrer)
@@ -190,6 +193,7 @@ class AdminController():
                         db.session.commit()
                         msg = ['Updated successfully!', 'success']
                     except: 
+                        db.session.rollback()
                         msg = ['Unable to update, please try again later!', 'error']
                 flash(msg[0], (msg[1]))
                 return redirect(request.referrer)
@@ -201,6 +205,7 @@ class AdminController():
                     db.session.commit()
                     msg =  ['User\'s record deleted successfully!', 'success']
                 except:
+                    db.session.rollback()
                     msg =  ['Unable to delete User\'s record, please try again later!', 'error']
                 flash(msg[0], (msg[1]))
                 return redirect(request.referrer)
@@ -257,6 +262,7 @@ class AdminController():
                     return redirect(url_for('login'))
                 except Exception as e:
                     print(e)
+                    db.session.rollback()
                     flash('Something went wrong, Please try again!', ('error'))
                     return redirect(request.referrer)
             flash('Fill out the form and try again!', ('error'))

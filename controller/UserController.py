@@ -74,7 +74,8 @@ class UserController():
                     if img_file !="None": user.image = img_file
                     db.session.commit()
                     msg = ['Profile updated successfully!', 'success']
-                except: 
+                except:
+                    db.session.rollback()
                     msg = ['Unable to update profile, please try again later!', 'error']
             session['user'] = user.to_dict()
             flash(msg[0], (msg[1]))
@@ -101,7 +102,8 @@ class UserController():
                 try: 
                     db.session.commit()
                     msg = ['Password updated successfully!', 'success']
-                except: 
+                except:
+                    db.session.rollback() 
                     msg = ['Unable to update password, please try again later!', 'error']
                 session['user'] = user.to_dict()
             flash(msg[0], (msg[1]))
@@ -134,7 +136,8 @@ class UserController():
                         db.session.add(user)
                         db.session.commit()
                         msg = ['New member registered successfully!', 'success']
-                    except: 
+                    except:
+                        db.session.rollback() 
                         msg = ['Unable to register member, please try again later!', 'error']
                 flash(msg[0], (msg[1]))
                 return redirect(request.referrer)
@@ -182,6 +185,7 @@ class UserController():
                     flash('You\'ve registered successfully,  login now please!', ('success'))
                     return redirect(url_for('login'))
                 except Exception as e:
+                    db.session.rollback()
                     print(e)
                     flash('Something went wrong, Please try again!', ('error'))
                     return redirect(request.referrer)
