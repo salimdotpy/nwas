@@ -1,8 +1,16 @@
 import os, random, time
 from flask import url_for, request
 from PIL import Image
+from models import User, Incident
 
 # USEFUL FUNCTIONS
+def getIncident(id):
+    result = Incident.query.get(id)
+    return result.to_dict()
+
+def getUser(id):
+    user = User.query.get(id)
+    return user.to_dict()
 
 def makeDirectory(path):
     if not os.path.exists(path):

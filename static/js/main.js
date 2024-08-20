@@ -119,6 +119,9 @@ function toast_it(option){
     var toasts = new toast();
     toasts.createToast(option);
 }
+
+// ================================================================================
+
 $("#toggle").on("click", function (e) {
     if(e.target !== document.querySelectorAll('.fa-bars')[0]) return;
     $("body").toggleClass("open");
@@ -155,4 +158,54 @@ $(document).on('mouseenter mouseleave', '.side-nav li', function (ev) {
             }
         }
     }
+});
+var loc_pos = {lat: 7.7200717, lng: 4.41305};
+//Get location function
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(showPosition, showError, {enableHighAccuracy: true, maximumAge: 5000});
+    } else {
+        toast_it({ text: 'Geolocation is not supported by this browser.', icon: 'error' });
+    }
+}
+
+function showPosition(position) {
+    loc_pos = position ?
+    {lat: position.coords.latitude, lng: position.coords.longitude} :
+    {lat: 6.1334096, lng: 6.8075828};
+}
+function showError(error) {
+    var x = "";
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            x = "User denied the request for Geolocation.";
+            break;
+        case error.POSITION_UNAVAILABLE:
+            x = "Location information is unavailable.";
+            break;
+        case error.TIMEOUT:
+            x = "The request to get user location timed out.";
+            break;
+        case error.UNKNOWN_ERROR:
+            x = "An unknown error occurred.";
+            break;
+    }
+    toast_it({ text: x, icon: 'warning' });
+    loc_pos = {lat: 6.1334096, lng: 6.8075828};
+}
+
+getLocation();  
+socket = io.connect('http://localhost:5000');
+// Listen for alarms
+socket.on('alarm_raised', function(data) {
+    const { id, msg } = data;
+    getLocation();
+    $('.alarm_raised').html(`      
+    <div class="alert alert-info fade in" role="alert">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        <i class='fa fa-fw fa-info-circle'></i>
+        ${msg}
+        <b><a href="{{url_for('user.track', id=${id}, loc='${loc_pos.lat},${loc_pos.lng}')}}">Join now!</a></b>
+    </div>
+    `);
 });

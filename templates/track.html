@@ -5,6 +5,7 @@
         padding: 0;
         margin: 0;
     }
+
     a .fa:before {
         font-size: large;
     }
@@ -40,7 +41,9 @@
 {% endblock %}
 {% block script_lib %}
 <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true'></script>
-<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    
+<!-- <script src="{{ url_for('static', filename='js/area.js') }}"></script> -->
 {% endblock %}
 {% block script %}
 <script>
@@ -51,7 +54,7 @@
             "></i></a>");
     })
 </script>
-<script>
+<!-- <script>
     getLocation();
     setTimeout(function () {
         initMap(true);
@@ -61,5 +64,98 @@
             updateLocation();
         }, 100);
     }, 10000);
+</script> -->
+<script>
+    let map;
+    let securityMarkers = {};
+    let currentPositionMarker;
+    let socket;
+    let mapType = ["hybrid", "roadmap", "satellite", "terrain", 0];
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 15,
+            center: { lat: 7.7200717, lng: 4.41305 },
+            mapTypeId: google.maps.MapTypeId.SATELLITE
+        });
+
+        // Connect to the WebSocket server
+        socket = io.connect('http://localhost:5000');
+
+        // Listen for location updates
+        socket.on('location_update', function (data) {
+            const { id, location } = data; location = location.split(',');
+            const lat = location[0], lng = location[1];
+            if (securityMarkers[id]) {
+                // Update marker position
+                securityMarkers[id].setPosition(new google.maps.LatLng(lat, lng));
+            } else {
+                // Create a new marker for the security personnel
+                securityMarkers[id] = new google.maps.Marker({
+                    position: { lat: lat, lng: lng },
+                    map: map,
+                    title: `{{getUser(${id}).surname}} {{getUser(${id}).othername}}`
+                });
+            }
+        });
+
+        // Listen for alarms
+        socket.on('alarm_raised', function (data) {
+            const { id, msg } = data;
+            toast_it({ text: msg, icon: 'info' });
+            // Optionally highlight the marker of the personnel who raised the alarm
+            if (securityMarkers[id]) {
+                securityMarkers[id].setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+            }
+        });
+
+        // Start tracking current user's location
+        trackUserLocation();
+    }
+
+    function trackUserLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function (position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                // Update the current user's marker
+                if (currentPositionMarker) {
+                    currentPositionMarker.setPosition(new google.maps.LatLng(lat, lng));
+                } else {
+                    currentPositionMarker = new google.maps.Marker({
+                        position: { lat: lat, lng: lng },
+                        map: map,
+                        title: "You",
+                        icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+                    });
+                }
+
+                // Send the updated location to the server
+                socket.emit('update_location', { iid: '{{incident.id}}', location: `${lat},${lng}` });
+            }, function (error) {
+                console.error("Error occurred while retrieving location: ", error);
+            }, {
+                enableHighAccuracy: true,
+                maximumAge: 10000,
+                timeout: 5000
+            });
+        } else {
+            toast_it({ text: 'Geolocation is not supported by this browser.', icon: 'error' });
+        }
+    }
+
+    window.onload = initMap;
+
+    function changeMap() {
+        map.setMapTypeId(mapType[mapType[-1]]);
+        if (mapType[-1] < 3) mapType[-1] += 1;
+        else mapType[-1] = 0;
+    }
+
+    function centerMap() {
+        getLocation();
+        map.setCenter(loc_pos);
+    }
 </script>
 {% endblock %}

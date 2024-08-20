@@ -3,8 +3,8 @@ from models import db
 
 @app.context_processor
 def utility_processor():
-    from helper import siteName, getImage
-    return dict(siteName=siteName, getImage=getImage)
+    from helper import siteName, getImage, getUser, getIncident
+    return dict(siteName=siteName, getImage=getImage, getUser=getUser, getIncident=getIncident)
 
 if __name__ == '__main__':
     # Create the database tables.

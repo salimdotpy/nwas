@@ -12,12 +12,7 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="alert alert-info fade in" role="alert">
-    <a href="#" class="close" data-dismiss="alert">&times;</a>
-    <i class='fa fa-fw fa-info-circle'></i>
-    You have new notification
-    <b><a href="{{url_for('user.track')}}">check</a></b>
-</div>
+<div class="alarm_raised"></div>
 <div class="row">
     <div class="col-md-6">
         <a href="#riaseAlarm" data-toggle="modal" data-backdrop="static">
@@ -139,7 +134,7 @@
 </div>
 {% endblock %}
 {% block script_lib %}
-<script src="{{ url_for('static', filename='js/area.js') }}"></script>
+<!-- <script src="{{ url_for('static', filename='js/area.js') }}"></script> -->
 {% endblock %}
 {% block script %}
 <div class="modal fade crud-modal-sm" id="editPassword" role="dialog">
@@ -147,7 +142,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">
-                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <button type="button" class="close" data-dismiss="modal">x</button>
                     <b>Change Password</b>
                 </h4>
             </div>

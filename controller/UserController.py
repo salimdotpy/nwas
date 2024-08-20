@@ -1,4 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for, session
+from flask_socketio import emit
 from models import User, Setting, Incident, Notification, db
 from werkzeug.security import generate_password_hash
 import time
@@ -18,15 +19,17 @@ class UserController():
                 elif not location:
                     msg = ['Unable to get your location, try again please!', 'error']
                 else:
-                    incident = Incident(uid=user.id, incident=incident, community=user.community, location=location)
+                    location = {'raiser': {user.id: location}}
+                    incident = Incident(uid=user.id, incident=incident, community=user.community, location=str(location))
                     try:
                         db.session.add(incident)
                         db.session.commit()
                         notify = Notification(iid=incident.id, text=f'New alarm raised by {user.surname} {user.othername}')
                         db.session.add(notify)
                         db.session.commit()
+                        emit('alarm_raised', {'id': incident.id, 'msg': f'New alarm raised by {user.surname} {user.othername}'}, broadcast=True)
                         flash('Alarm riased successfully!', 'success')
-                        return redirect(url_for('user.track'))
+                        return redirect(url_for('user.track', id=incident.id, loc=location))
                     except: 
                         db.session.rollback() 
                         msg = ['Unable to riased alarm, please try again later!', 'error']
@@ -36,11 +39,24 @@ class UserController():
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
     
-    def track():
+    def track(id, loc):
         pageTitle = "Track Page" 
         if 'user' in session:
             user = User.query.get(session['user']['id'])
-            return render_template('track.html', pageTitle=pageTitle, user=user)
+            incident = Incident.query.get(id)
+            alarm = incident.to_dict()
+            if alarm.raiser.id != user.id:
+                try:
+                    location = alarm.location['member'][user.id] = loc
+                except:
+                    location = alarm.location['member'] = {user.id: loc}
+                try:
+                    incident.location = location
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+            emit('member_join', {'id': user.id, location: loc}, broadcast=True)
+            return render_template('track.html', pageTitle=pageTitle, user=user, incident=incident)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
     

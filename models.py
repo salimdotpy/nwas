@@ -88,10 +88,24 @@ class Incident(db.Model):
     status = db.Column(db.String(40, collation='utf8mb4_unicode_ci'), default=None, nullable=True)
     remark = db.Column(db.String(40, collation='utf8mb4_unicode_ci'), default=None, nullable=True)
     raiser = db.relationship('User', foreign_keys=uid)
-    location = db.Column(db.String(40, collation='utf8mb4_unicode_ci'), default=None, nullable=True)
+    location = db.Column(db.Text(collation='utf8mb4_unicode_ci'), nullable=False)
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now)
-        
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'uid': self.uid,
+            'incident': self.incident,
+            'community': self.community,
+            'status': self.status,
+            'remark': self.remark,
+            'raiser': self.raiser,
+            'location': eval(self.location),
+            'created_at': str(self.created_at),
+            'updated_at': str(self.updated_at)
+        }
+    
 class Notification(db.Model):
     __tablename__ = "notifications"
 
