@@ -31,8 +31,7 @@
                         </p>
                         <div class="form-group">
                             <button type="reset" class="btn btn-danger">Cancel</button>
-                            <a href="#forgotPasswordModal" class="pull-right" data-toggle="modal" data-backdrop="static"
-                                data-db="security">
+                            <a href="#forgotPasswordModal" class="pull-right" data-toggle="modal" data-backdrop="static">
                                 Forgot Password?
                             </a>
                         </div>
@@ -76,32 +75,30 @@
                 <h4 class="modal-title">Forgot Password Form</h4>
             </div>
             <div class="modal-body">
-                <div id="forgot_error" class="w3-text-red"></div>
+                <div id="forgot_error" class="text-danger"></div>
                 <form role="form" id="forgotP">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
                     <div class="form-group">
-                        <label class="control-label">Email Address</label>
-                        <input type="email" class="form-control" placeholder="Enter Email Address" name="email"
+                        <label class="control-label">Surname</label>
+                        <input type="text" class="form-control" placeholder="Enter Surname" name="surname"
                             required>
                     </div>
                     <div class="form-group">
                         <label class="control-label">Phone Number</label>
-                        <input type="number" class="form-control" placeholder="Enter Phone Number" name="contact"
+                        <input type="tel" class="form-control" placeholder="Enter Phone Number" name="contact"
                             required>
-                        <input type="hidden" name="tbl" value="security">
                     </div>
                 </form>
                 <form role="form" class="" id="resetP">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}"/>
                     <div class="form-group">
                         <label class="control-label">Create new Password</label>
-                        <input type="password" class="form-control" placeholder="Create new Password" name="npass"
-                            required>
+                        <input type="password" class="form-control" placeholder="Create new Password" name="npass" required>
                     </div>
                     <div class="form-group">
                         <label class="control-label">Confirm Password</label>
-                        <input type="password" class="form-control" placeholder="Confirm Password" name="cpass"
-                            required>
-                        <input type="hidden" name="email" id="email">
-                        <input type="hidden" name="tbl" value="users">
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="cpass" required>
+                        <input type="hidden" name="contact" id="contact">
                     </div>
                 </form>
             </div>
@@ -131,10 +128,6 @@
     var check = true;
     $('#forgotPasswordModal').on('hidden.bs.modal', function () {
         window.location.reload();
-    }).on('show.bs.modal', function (event) {
-        var ele = $(event.relatedTarget);
-        var db = ele.data('db');
-        $(this).find("input[name='tbl']").val(db);
     });
     function forgotRest() {
         $("#forgot_error").html('');
@@ -150,7 +143,7 @@
                         $('#forgotP').hide();
                         $("#forgot_error").html('');
                         $('#resetP').show();
-                        $('#email').val(res[0]);
+                        $('#contact').val(res[0]);
                     }
                     else {
                         check = true;

@@ -195,7 +195,7 @@ function showError(error) {
 }
 
 getLocation();  
-socket = io.connect('http://localhost:5000');
+socket = io.connect('http://127.0.0.1:5000/');
 // Listen for alarms
 socket.on('alarm_raised', function(data) {
     const { id, msg } = data;

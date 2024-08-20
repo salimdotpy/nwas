@@ -51,11 +51,11 @@ class UserController():
                 except:
                     location = alarm.location['member'] = {user.id: loc}
                 try:
-                    incident.location = location
+                    incident.location = str(location)
                     db.session.commit()
                 except:
                     db.session.rollback()
-            emit('member_join', {'id': user.id, location: loc}, broadcast=True)
+            emit('member_join', {'id': user.id, 'location': loc}, broadcast=True)
             return render_template('track.html', pageTitle=pageTitle, user=user, incident=incident)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
@@ -224,6 +224,39 @@ class UserController():
             return redirect(url_for('user.dashboard'))
         return render_template('login.html', pageTitle=pageTitle)
     
+    def forgetRestPass():
+        msg = ''
+        if request.method == 'POST' and 'forgotP' in request.form:
+            # Create variables for easy access
+            contact = request.form['contact']
+            surname = request.form['surname']
+            # Check if account exists
+            user = User.query.filter_by(mobile=contact, surname=surname).first()
+            if user: return [contact, True]
+            else: return ['Invalid Credential!', False]
+        if request.method == 'POST'and 'resetP' in request.form:
+            # Create variables for easy access
+            msg = ''
+            npass = request.form['npass']
+            cpass = request.form['cpass']
+            contact = request.form['contact']
+            # validation checks
+            if not npass or not cpass or not contact:
+                msg = ['Please fill out the form!', 'error']
+            elif npass != cpass:
+                msg = ['Two password does not match!', 'error']
+            else:
+                update = User.query.filter_by(mobile=contact).first()
+                password = generate_password_hash(npass)
+                update.password = password
+                try:
+                    db.session.commit()
+                    return ['Password reset successfully!', 'success']
+                except:
+                    db.session.rollback()
+                    return ['Unable to reset Password, Please try again!', 'error']
+        return msg
+
     def logout():
         session.pop('user', None)
         flash('You have successfully logged out!', ('warning'))

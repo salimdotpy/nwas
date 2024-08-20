@@ -73,15 +73,33 @@
     let mapType = ["hybrid", "roadmap", "satellite", "terrain", 0];
 
     function initMap() {
+        const location = "{{incident.location.raiser[user.id]}}".split(',');
         map = new google.maps.Map(document.getElementById('map'), {
             zoom: 15,
-            center: { lat: 7.7200717, lng: 4.41305 },
+            center: { lat: location[0], lng: location[1] },
             mapTypeId: google.maps.MapTypeId.SATELLITE
         });
 
         // Connect to the WebSocket server
-        socket = io.connect('http://localhost:5000');
+        socket = io.connect('http://127.0.0.1:5000/');
+        // Listen for member_join
+        socket.on('member_join', function (data) {
+            const { id, location } = data; location = location.split(',');
+            const lat = location[0], lng = location[1];
+            if (securityMarkers[id]) {
+                // Update marker position
+                securityMarkers[id].setPosition(new google.maps.LatLng(lat, lng));
+            } else {
+                // Create a new marker for the security personnel
+                securityMarkers[id] = new google.maps.Marker({
+                    position: { lat: lat, lng: lng },
+                    map: map,
+                    title: `{{getUser(${id}).surname}} {{getUser(${id}).othername}}`
+                });
+            }
+        });
 
+        
         // Listen for location updates
         socket.on('location_update', function (data) {
             const { id, location } = data; location = location.split(',');
