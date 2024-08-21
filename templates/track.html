@@ -20,21 +20,33 @@
         <input type="hidden" id="loc" value="{%if incident.raiser.id == user.id %}{{incident.location['raiser'][user.id]|safe|e}} {%else%} {{incident.location['member'][user.id]|safe|e}} {% endif %}"/>
         <a onclick="changeMap();"><i class="fa fa-image"></i></a>
         <a onclick="centerMap();"><i class="fa fa-arrows"></i></a>
+        {%if incident.raiser.id == user.id %}
+        <a href="#remarkModal" data-toggle="modal" class="text-danger"><i class="fa fa-close"></i></a>
+        {% endif %}
         <a onclick="document.location.reload();"><i class="fa fa-refresh"></i></a>
     </div>
 </div>
-<div id="distanceModal" class="modal fade">
+<div id="remarkModal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Distance</h4>
+                <h4 class="modal-title">Stop Tracking</h4>
             </div>
             <div class="modal-body" id="distance" style="max-height: 70vh; overflow-y: auto">
-                <p>Distance between each points will appear here</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <p>You are about to stop tracking</p>
+                <form class="" method="post">
+                    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                    <div class="form-group">
+                        <label class="required">Remark:</label>
+                        <input type="text" name="remark" class="form-control" placeholder="eg. Successful" required>
+                        <input type="hidden" name="id" value="{{incident.id}}"/>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary pull-right" name="stopTrack" type="submit">Stop</button>
+                        <button class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
