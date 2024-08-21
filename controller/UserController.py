@@ -1,5 +1,5 @@
 from flask import render_template, request, flash, redirect, url_for, session
-from flask_socketio import emit
+from flask_socketio import SocketIO, emit
 from models import User, Setting, Incident, Notification, db
 from werkzeug.security import generate_password_hash
 import time
@@ -28,7 +28,7 @@ class UserController():
                         notify = Notification(iid=incident.id, text=f'New alarm raised by {user.surname} {user.othername}')
                         db.session.add(notify)
                         db.session.commit()
-                        emit('alarm_raised', {'id': incident.id, 'msg': f'New alarm raised by {user.surname} {user.othername}'}, broadcast=True)
+                        # emit('alarm_raised', {'id': incident.id, 'msg': f'New alarm raised by {user.surname} {user.othername}'}, broadcast=True)
                         flash('Alarm riased successfully!', 'success')
                         return redirect(url_for('user.track', id=incident.id, loc=location))
                     except: 
@@ -56,7 +56,7 @@ class UserController():
                     db.session.commit()
                 except:
                     db.session.rollback()
-            emit('member_join', {'id': user.id, 'name': f'{user.surname} {user.othername}', 'location': loc}, broadcast=True)
+            # emit('member_join', {'id': user.id, 'name': f'{user.surname} {user.othername}', 'location': loc}, broadcast=True)
             return render_template('track.html', pageTitle=pageTitle, user=user, incident=alarm)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))

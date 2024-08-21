@@ -17,6 +17,7 @@
     <input id='txt-marker-coord' type='text' value='' hidden>
 
     <div class="map-keys">
+        <input type="hidden" id="loc" value="{%if incident.raiser.id == user.id %}{{incident.location['raiser'][user.id]|safe|e}} {%else%} {{incident.location['member'][user.id]|safe|e}} {% endif %}"/>
         <a onclick="changeMap();"><i class="fa fa-image"></i></a>
         <a onclick="centerMap();"><i class="fa fa-arrows"></i></a>
         <a onclick="document.location.reload();"><i class="fa fa-refresh"></i></a>
@@ -54,17 +55,6 @@
             "></i></a>");
     })
 </script>
-<!-- <script>
-    getLocation();
-    setTimeout(function () {
-        initMap(true);
-    }, 5000);
-    setTimeout(() => {
-        setInterval(() => {
-            updateLocation();
-        }, 100);
-    }, 10000);
-</script> -->
 <script>
     let map;
     let securityMarkers = {};
@@ -72,7 +62,7 @@
     let socket;
     let mapType = ["hybrid", "roadmap", "satellite", "terrain", 0];
     function initMap() {
-        const location = "{{incident.location['member'][user.id]|safe|e}}".split(',');
+        const location = $('#loc').val().split(',');
         map = new google.maps.Map(document.getElementById('map'), {
             zoom: 17,
             center: { lat: parseInt(location[0]), lng: parseInt(location[1]) },
