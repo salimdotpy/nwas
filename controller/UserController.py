@@ -9,6 +9,7 @@ class UserController():
         pageTitle = "User Dashboard"
         if 'user' in session:
             user = User.query.get(session['user']['id'])
+            notify = Notification.query.filter_by(community=user.community).first()
             pageTitle = "Member Dashboard" if user.role == 0 else "Coordinator Dashboard"
             if request.method == 'POST' and 'riaseAlarm' in request.form:
                 incident = request.form['incident']
@@ -35,7 +36,7 @@ class UserController():
                         msg = ['Unable to riased alarm, please try again later!', 'error']
                 flash(msg[0], (msg[1]))
                 return redirect(request.referrer)
-            return render_template('dashboard.html', pageTitle=pageTitle, user=user)
+            return render_template('dashboard.html', pageTitle=pageTitle, user=user, notify=notify)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
     
@@ -45,18 +46,18 @@ class UserController():
             user = User.query.get(session['user']['id'])
             incident = Incident.query.get(id)
             alarm = incident.to_dict()
-            if alarm.raiser.id != user.id:
+            if incident.raiser.id != user.id:
                 try:
-                    location = alarm.location['member'][user.id] = loc
+                    alarm['location']['member'][user.id] = loc
                 except:
-                    location = alarm.location['member'] = {user.id: loc}
+                    alarm['location']['member'] = {user.id: loc}
                 try:
-                    incident.location = str(location)
+                    incident.location = str(alarm['location'])
                     db.session.commit()
                 except:
                     db.session.rollback()
-            emit('member_join', {'id': user.id, 'location': loc}, broadcast=True)
-            return render_template('track.html', pageTitle=pageTitle, user=user, incident=incident)
+            emit('member_join', {'id': user.id, 'name': f'{user.surname} {user.othername}', 'location': loc}, broadcast=True)
+            return render_template('track.html', pageTitle=pageTitle, user=user, incident=alarm)
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
     

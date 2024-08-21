@@ -112,6 +112,7 @@ class Notification(db.Model):
     id = db.Column(db.BigInteger(), primary_key=True, autoincrement=True)
     iid = db.Column(db.BigInteger(), db.ForeignKey('incidents.id'), nullable=True)
     text = db.Column(db.Text(collation='utf8mb4_unicode_ci'), nullable=False)
+    community = db.Column(db.String(40, collation='utf8mb4_unicode_ci'), default=None, nullable=True)
     status = db.Column(db.String(40, collation='utf8mb4_unicode_ci'), default=None, nullable=True)
     notify = db.relationship('Incident', foreign_keys=iid)
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)

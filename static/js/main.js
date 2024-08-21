@@ -193,8 +193,6 @@ function showError(error) {
     toast_it({ text: x, icon: 'warning' });
     loc_pos = {lat: 6.1334096, lng: 6.8075828};
 }
-
-getLocation();  
 socket = io.connect('http://127.0.0.1:5000/');
 // Listen for alarms
 socket.on('alarm_raised', function(data) {
@@ -205,7 +203,7 @@ socket.on('alarm_raised', function(data) {
         <a href="#" class="close" data-dismiss="alert">&times;</a>
         <i class='fa fa-fw fa-info-circle'></i>
         ${msg}
-        <b><a href="{{url_for('user.track', id=${id}, loc='${loc_pos.lat},${loc_pos.lng}')}}">Join now!</a></b>
+        <b><a href="/user/track/${id}/${loc_pos.lat},${loc_pos.lng}" class="btn btn-info btn-sm">Join now!</a></b>
     </div>
     `);
 });

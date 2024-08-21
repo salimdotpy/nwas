@@ -62,14 +62,15 @@ def update_location(data):
         user = User.query.get(session['user']['id'])
         incident = Incident.query.get(data['iid'])
         alarm = incident.to_dict()
-        if alarm.raiser.id != user.id:
+        if incident.raiser.id != user.id:
             try:
-                location = alarm.location['member'][user.id] = data['loc']
+                alarm['location']['member'][user.id] = data['loc']
             except:
-                location = alarm.location['member'] = {user.id: data['loc']}
-            try:
-                incident.location = str(location)
-                db.session.commit()
-            except:
-                db.session.rollback()
-        emit('location_update', {'id': user.id, 'location': data['loc']}, broadcast=True)
+                alarm['location']['member'] = {user.id: data['loc']}
+        else: alarm['location']['raiser'] = {user.id: data['loc']}
+        try:
+            incident.location = str(alarm['location'])
+            db.session.commit()
+        except:
+            db.session.rollback()
+        emit('location_update', {'id': user.id, 'name': f'{user.surname} {user.othername}', 'location': data['loc']}, broadcast=True)

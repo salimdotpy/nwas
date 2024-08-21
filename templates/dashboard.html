@@ -12,7 +12,17 @@
 </style>
 {% endblock %}
 {% block content %}
-<div class="alarm_raised"></div>
+<div class="row">
+    <div class="alarm_raised col-md-6">
+        {%if notify%}
+        <div class="alert alert-info fade in" role="alert">
+            <i class='fa fa-fw fa-info-circle'></i>
+            {{notify.text}}
+            <a href="" id="join" class="btn btn-info btn-sm pull-right" style="margin-top: -4.5px;">Join now!</a>
+        </div>
+        {%endif%}
+    </div>    
+</div>
 <div class="row">
     <div class="col-md-6">
         <a href="#riaseAlarm" data-toggle="modal" data-backdrop="static">
@@ -256,9 +266,10 @@
         $('.fa-power-off').hide();
         // $('#a_history').DataTable();
         // $('#a_history_wrapper').addClass('table-responsive');
-        var loc = $('input[name="location"]');
+        var join = $('#join'), loc = $('input[name="location"]');
         getLocation();
-        loc.val(`${loc_pos.lat},${loc_pos.lng}`);
+        join.attr('href',`/user/track/{{notify.iid}}/${loc_pos.lat},${loc_pos.lng}`);
+        loc.val(`${loc_pos.lat},${loc_pos.lng}`)
     })
     function imgs(input, destination) {
         if (input.files[0]) {

@@ -71,20 +71,18 @@
     let currentPositionMarker;
     let socket;
     let mapType = ["hybrid", "roadmap", "satellite", "terrain", 0];
-
     function initMap() {
-        const location = "{{incident.location.raiser[user.id]}}".split(',');
+        const location = "{{incident.location['member'][user.id]|safe|e}}".split(',');
         map = new google.maps.Map(document.getElementById('map'), {
-            zoom: 15,
-            center: { lat: location[0], lng: location[1] },
+            zoom: 17,
+            center: { lat: parseInt(location[0]), lng: parseInt(location[1]) },
             mapTypeId: google.maps.MapTypeId.SATELLITE
         });
-
         // Connect to the WebSocket server
         socket = io.connect('http://127.0.0.1:5000/');
         // Listen for member_join
         socket.on('member_join', function (data) {
-            const { id, location } = data; location = location.split(',');
+            const { id, name, location } = data; location = location.split(',');
             const lat = location[0], lng = location[1];
             if (securityMarkers[id]) {
                 // Update marker position
@@ -94,7 +92,7 @@
                 securityMarkers[id] = new google.maps.Marker({
                     position: { lat: lat, lng: lng },
                     map: map,
-                    title: `{{getUser(${id}).surname}} {{getUser(${id}).othername}}`
+                    title: name
                 });
             }
         });
@@ -102,7 +100,7 @@
         
         // Listen for location updates
         socket.on('location_update', function (data) {
-            const { id, location } = data; location = location.split(',');
+            const { id, name, location } = data; location = location.split(',');
             const lat = location[0], lng = location[1];
             if (securityMarkers[id]) {
                 // Update marker position
@@ -112,7 +110,7 @@
                 securityMarkers[id] = new google.maps.Marker({
                     position: { lat: lat, lng: lng },
                     map: map,
-                    title: `{{getUser(${id}).surname}} {{getUser(${id}).othername}}`
+                    title: name
                 });
             }
         });
@@ -136,7 +134,7 @@
             navigator.geolocation.watchPosition(function (position) {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-
+                map.setCenter({ lat: lat, lng: lng });
                 // Update the current user's marker
                 if (currentPositionMarker) {
                     currentPositionMarker.setPosition(new google.maps.LatLng(lat, lng));
@@ -150,13 +148,12 @@
                 }
 
                 // Send the updated location to the server
-                socket.emit('update_location', { iid: '{{incident.id}}', location: `${lat},${lng}` });
+                socket.emit('update_location', { iid: '{{incident.id}}', 'loc': `${lat},${lng}` });
             }, function (error) {
                 console.error("Error occurred while retrieving location: ", error);
             }, {
                 enableHighAccuracy: true,
-                maximumAge: 10000,
-                timeout: 5000
+                maximumAge: 10000
             });
         } else {
             toast_it({ text: 'Geolocation is not supported by this browser.', icon: 'error' });
