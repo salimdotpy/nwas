@@ -17,7 +17,8 @@
     <input id='txt-marker-coord' type='text' value='' hidden>
 
     <div class="map-keys">
-        <input type="hidden" id="loc" value="{%if incident.raiser.id == user.id %}{{incident.location['raiser'][user.id]|safe|e}} {%else%} {{incident.location['member'][user.id]|safe|e}} {% endif %}"/>
+        <input type="hidden" id="loc"
+            value="{%if incident.raiser.id == user.id %}{{incident.location['raiser'][user.id]|safe|e}} {%else%} {{incident.location['member'][user.id]|safe|e}} {% endif %}" />
         <a onclick="changeMap();"><i class="fa fa-image"></i></a>
         <a onclick="centerMap();"><i class="fa fa-arrows"></i></a>
         {%if incident.raiser.id == user.id %}
@@ -40,7 +41,7 @@
                     <div class="form-group">
                         <label class="required">Remark:</label>
                         <input type="text" name="remark" class="form-control" placeholder="eg. Successful" required>
-                        <input type="hidden" name="id" value="{{incident.id}}"/>
+                        <input type="hidden" name="id" value="{{incident.id}}" />
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary pull-right" name="stopTrack" type="submit">Stop</button>
@@ -55,7 +56,7 @@
 {% block script_lib %}
 <script src='https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true'></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
-    
+
 <!-- <script src="{{ url_for('static', filename='js/area.js') }}"></script> -->
 {% endblock %}
 {% block script %}
@@ -80,52 +81,6 @@
             center: { lat: parseInt(location[0]), lng: parseInt(location[1]) },
             mapTypeId: google.maps.MapTypeId.SATELLITE
         });
-        // Connect to the WebSocket server
-        socket = io.connect('http://127.0.0.1:5000/');
-        // Listen for member_join
-        socket.on('member_join', function (data) {
-            const { id, name, location } = data; location = location.split(',');
-            const lat = location[0], lng = location[1];
-            if (securityMarkers[id]) {
-                // Update marker position
-                securityMarkers[id].setPosition(new google.maps.LatLng(lat, lng));
-            } else {
-                // Create a new marker for the security personnel
-                securityMarkers[id] = new google.maps.Marker({
-                    position: { lat: lat, lng: lng },
-                    map: map,
-                    title: name
-                });
-            }
-        });
-
-        
-        // Listen for location updates
-        socket.on('location_update', function (data) {
-            const { id, name, location } = data; location = location.split(',');
-            const lat = location[0], lng = location[1];
-            if (securityMarkers[id]) {
-                // Update marker position
-                securityMarkers[id].setPosition(new google.maps.LatLng(lat, lng));
-            } else {
-                // Create a new marker for the security personnel
-                securityMarkers[id] = new google.maps.Marker({
-                    position: { lat: lat, lng: lng },
-                    map: map,
-                    title: name
-                });
-            }
-        });
-
-        // Listen for alarms
-        socket.on('alarm_raised', function (data) {
-            const { id, msg } = data;
-            toast_it({ text: msg, icon: 'info' });
-            // Optionally highlight the marker of the personnel who raised the alarm
-            if (securityMarkers[id]) {
-                securityMarkers[id].setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
-            }
-        });
 
         // Start tracking current user's location
         trackUserLocation();
@@ -142,21 +97,13 @@
                     currentPositionMarker.setPosition(new google.maps.LatLng(lat, lng));
                 } else {
                     currentPositionMarker = new google.maps.Marker({
-                        position: { lat: lat, lng: lng },
-                        map: map,
-                        title: "You",
+                        position: { lat: lat, lng: lng }, map: map, title: "You",
                         icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
                     });
-                }
-
-                // Send the updated location to the server
-                socket.emit('update_location', { iid: '{{incident.id}}', 'loc': `${lat},${lng}` });
+                } track();
             }, function (error) {
                 console.error("Error occurred while retrieving location: ", error);
-            }, {
-                enableHighAccuracy: true,
-                maximumAge: 10000
-            });
+            }, { enableHighAccuracy: true, maximumAge: 10000 });
         } else {
             toast_it({ text: 'Geolocation is not supported by this browser.', icon: 'error' });
         }
@@ -173,6 +120,37 @@
     function centerMap() {
         getLocation();
         map.setCenter(loc_pos);
+    }
+
+    function track() {
+        $.ajax({
+            url: '{{url_for("user.monitor")}}', method: 'post', data: 'location_update=1&csrf_token={{csrf_token()}}',
+            dataType: 'json',
+            success: function (res) {
+                if (res) {
+                    $.each(res, function (i, data) {
+                        var { id, name, location } = data; location = location.split(',');
+                        // console.log(id, name, location);
+                        if (i==0) securityMarkers[id].setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+                        if (securityMarkers[id]) {
+                            // Update marker position
+                            securityMarkers[id].setPosition(new google.maps.LatLng(lat, lng));
+                        } else {
+                            // Create a new marker for the security personnel
+                            securityMarkers[id] = new google.maps.Marker({
+                                position: { lat: lat, lng: lng },
+                                map: map,
+                                title: name,
+                                icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+                            });
+                        }
+                    })
+                }
+            },
+            error: function (e) {
+                console.log(e);
+            }
+        })
     }
 </script>
 {% endblock %}

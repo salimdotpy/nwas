@@ -61,22 +61,6 @@ function changeMap() {
     if (mapType[-1] < 3) mapType[-1] += 1;
     else mapType[-1] = 0;
 }
-function updateLocation(){
-    getLocation()
-    placeMarker(cord_pos, false, false);
-    map.setCenter(cord_pos);
-    $.ajax({
-        url: '/forgetRestPass',
-        method: 'post',
-        data: 'ajax=1&forgotP=1',
-        success: function (res) {
-            
-        },
-        error: function (e) {
-            console.log(e);
-        }
-    })
-}
 
 function centerMap() {
     getLocation();

@@ -43,6 +43,7 @@ app.add_url_rule('/user/profile','user.profile', UserController.profileUpdate, m
 app.add_url_rule('/user/password','user.password', UserController.passwordUpdate, methods=['POST'])
 app.add_url_rule('/user/member','user.member', UserController.member, methods=['GET', 'POST'])
 app.add_url_rule('/user/track/<id>/<loc>','user.track', UserController.track, methods=['GET', 'POST'])
+app.add_url_rule('/user/monitor','user.monitor', UserController.monitor, methods=['GET', 'POST'])
 app.add_url_rule('/forgetRestPass','user.frpass', UserController.forgetRestPass, methods=['GET', 'POST'])
 
 @app.route('/', methods=['GET'])

@@ -61,6 +61,31 @@ class UserController():
         flash('Please login first!', ('warning'))
         return redirect(url_for('login'))
     
+    def monitor():
+        if 'user' in session:
+            user = User.query.get(session['user']['id'])
+            incident = Incident.query.filter_by(community=user.community).all()
+            if request.method == 'POST' and 'alarm_raised' in request.form:
+                return Notification.query.filter_by(community=user.community).all()
+            if request.method == 'POST' and 'location_update' in request.form:
+                incident = [{'location': list(eval(e.location).values())} for e in incident]
+                location = None
+                try:
+                    location = []
+                    for i, j in incident[0]['location'][0].items():
+                        get = User.query.get(i)
+                        location.append({'id': i, 'name': f'{get.surname} {get.othername}', 'location': j})
+                    for i, j in incident[0]['location'][1].items():
+                        get = User.query.get(i)
+                        location.append({'id': i, 'name': f'{get.surname} {get.othername}', 'location': j})
+                except:
+                    location = []
+                    for i, j in incident[0]['location'][0].items():
+                        get = User.query.get(i)
+                        location.append({'id': i, 'name': f'{get.surname} {get.othername}', 'location': j})
+                return location
+
+
     def profileUpdate():
         if 'user' in session:
             user = User.query.get(session['user']['id'])
