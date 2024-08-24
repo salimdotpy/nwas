@@ -84,7 +84,8 @@ class UserController():
                         get = User.query.get(i)
                         location.append({'id': i, 'name': f'{get.surname} {get.othername}', 'location': j})
                 return location
-
+            return None
+        return None
 
     def profileUpdate():
         if 'user' in session:
