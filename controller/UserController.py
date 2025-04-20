@@ -85,7 +85,8 @@ class UserController():
                         location.append({'id': i, 'name': f'{get.surname} {get.othername}', 'location': j})
                 return location
             return None
-        return None
+        flash('Please login first!', ('warning'))
+        return redirect(url_for('login'))
 
     def profileUpdate():
         if 'user' in session:
